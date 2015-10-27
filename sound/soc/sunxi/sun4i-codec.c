@@ -596,8 +596,8 @@ static const struct snd_soc_dapm_widget sun4i_codec_dapm_widgets[] = {
 	SND_SOC_DAPM_PGA("MIC1 Pre-Amplifier", SUN4I_CODEC_ADC_ACTL,
 			 SUN4I_CODEC_ADC_ACTL_PREG1EN, 0, NULL, 0),
 
-	/* Pre-Amplifier */
-	SND_SOC_DAPM_MIXER("Pre-Amplifier", SUN4I_CODEC_ADC_ACTL,
+	/* Power Amplifier */
+	SND_SOC_DAPM_MIXER("Power Amplifier", SUN4I_CODEC_ADC_ACTL,
 			   SUN4I_CODEC_ADC_ACTL_PA_EN, 0,
 			   sun4i_codec_pa_mixer_controls,
 			   ARRAY_SIZE(sun4i_codec_pa_mixer_controls)),
@@ -638,11 +638,6 @@ static const struct snd_soc_dapm_route sun4i_codec_dapm_routes[] = {
 	{ "Power Amplifier Mute", "Switch", "Power Amplifier" },
 	{ "HP Right", NULL, "Power Amplifier Mute" },
 	{ "HP Left", NULL, "Power Amplifier Mute" },
-
-	/* PA -> HP path */
-	{ "Pre-Amplifier Mute", "Switch", "Pre-Amplifier" },
-	{ "HP Right", NULL, "Pre-Amplifier Mute" },
-	{ "HP Left", NULL, "Pre-Amplifier Mute" },
 
 	/* Mic1 Routes */
 	{ "Left ADC", NULL, "MIC1 Pre-Amplifier" },
