@@ -569,29 +569,26 @@ static int erase_worker(struct ubi_device *ubi, struct ubi_work *wl_wrk,
 			int shutdown);
 
 /**
- * schedule_erase - schedule an erase work.
+ * prepare_erase_work - prepare an erase work.
  * @ubi: UBI device description object
  * @e: the WL entry of the physical eraseblock to erase
  * @vol_id: the volume ID that last used this PEB
  * @lnum: the last used logical eraseblock number for the PEB
  * @torture: if the physical eraseblock has to be tortured
  *
- * This function returns zero in case of success and a %-ENOMEM in case of
- * failure.
+ * This function returns a struct ubi_work in case of success
+ * and an ERR_PTR(%-ENOMEM) in case of failure.
  */
-static int schedule_erase(struct ubi_device *ubi, struct ubi_wl_entry *e,
-			  int vol_id, int lnum, int torture, bool nested)
+static struct ubi_work *prepare_erase_work(struct ubi_wl_entry *e, int vol_id,
+					   int lnum, int torture)
 {
 	struct ubi_work *wl_wrk;
 
 	ubi_assert(e);
 
-	dbg_wl("schedule erasure of PEB %d, EC %d, torture %d",
-	       e->pnum, e->ec, torture);
-
 	wl_wrk = kmalloc(sizeof(struct ubi_work), GFP_NOFS);
 	if (!wl_wrk)
-		return -ENOMEM;
+		return ERR_PTR(-ENOMEM);
 
 	wl_wrk->func = &erase_worker;
 	wl_wrk->e = e;
@@ -603,6 +600,33 @@ static int schedule_erase(struct ubi_device *ubi, struct ubi_wl_entry *e,
 		__schedule_ubi_work(ubi, wl_wrk);
 	else
 		schedule_ubi_work(ubi, wl_wrk);
+
+	return wl_wrk;
+}
+
+/**
+ * schedule_erase - schedule an erase work.
+ * @ubi: UBI device description object
+ * @e: the WL entry of the physical eraseblock to erase
+ * @vol_id: the volume ID that last used this PEB
+ * @lnum: the last used logical eraseblock number for the PEB
+ * @torture: if the physical eraseblock has to be tortured
+ *
+ * This function returns zero in case of success and a %-ENOMEM in case of
+ * failure.
+ */
+static int schedule_erase(struct ubi_device *ubi, struct ubi_wl_entry *e,
+			  int vol_id, int lnum, int torture)
+{
+	struct ubi_work *wl_wrk = prepare_erase_work(e, vol_id, lnum, torture);
+
+	dbg_wl("schedule erasure of PEB %d, EC %d, torture %d",
+	       e->pnum, e->ec, torture);
+
+	if (IS_ERR(wl_wrk))
+		return PTR_ERR(wl_wrk);
+
+	schedule_ubi_work(ubi, wl_wrk);
 	return 0;
 }
 
