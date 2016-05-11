@@ -1453,7 +1453,10 @@ static int ubifs_set_page_dirty(struct page *page)
 	return ret;
 }
 
+<<<<<<< HEAD
 #ifdef CONFIG_MIGRATION
+=======
+>>>>>>> UBIFS: Implement ->migratepage()
 static int ubifs_migrate_page(struct address_space *mapping,
 		struct page *newpage, struct page *page, enum migrate_mode mode)
 {
@@ -1471,7 +1474,6 @@ static int ubifs_migrate_page(struct address_space *mapping,
 	migrate_page_copy(newpage, page);
 	return MIGRATEPAGE_SUCCESS;
 }
-#endif
 
 static int ubifs_releasepage(struct page *page, gfp_t unused_gfp_flags)
 {
@@ -1612,9 +1614,7 @@ const struct address_space_operations ubifs_file_address_operations = {
 	.write_end      = ubifs_write_end,
 	.invalidatepage = ubifs_invalidatepage,
 	.set_page_dirty = ubifs_set_page_dirty,
-#ifdef CONFIG_MIGRATION
 	.migratepage	= ubifs_migrate_page,
-#endif
 	.releasepage    = ubifs_releasepage,
 };
 
