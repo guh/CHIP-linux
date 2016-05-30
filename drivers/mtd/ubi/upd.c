@@ -148,9 +148,10 @@ int ubi_start_update(struct ubi_device *ubi, struct ubi_volume *vol,
 			return err;
 	}
 
-	err = ubi_wl_flush(ubi, UBI_ALL, UBI_ALL);
-	if (err)
-		return err;
+	if (bytes == 0) {
+		err = ubi_wl_flush(ubi);
+		if (err)
+			return err;
 
 	if (bytes == 0) {
 		err = clear_update_marker(ubi, vol, 0);
@@ -361,7 +362,7 @@ int ubi_more_update_data(struct ubi_device *ubi, struct ubi_volume *vol,
 
 	ubi_assert(vol->upd_received <= vol->upd_bytes);
 	if (vol->upd_received == vol->upd_bytes) {
-		err = ubi_wl_flush(ubi, UBI_ALL, UBI_ALL);
+		err = ubi_wl_flush(ubi);
 		if (err)
 			return err;
 		/* The update is finished, clear the update marker */
