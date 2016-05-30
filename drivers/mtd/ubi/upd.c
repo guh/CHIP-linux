@@ -149,7 +149,7 @@ int ubi_start_update(struct ubi_device *ubi, struct ubi_volume *vol,
 	}
 
 	if (bytes == 0) {
-		err = ubi_wl_flush(ubi);
+		err = ubi_work_flush(ubi);
 		if (err)
 			return err;
 
@@ -362,7 +362,7 @@ int ubi_more_update_data(struct ubi_device *ubi, struct ubi_volume *vol,
 
 	ubi_assert(vol->upd_received <= vol->upd_bytes);
 	if (vol->upd_received == vol->upd_bytes) {
-		err = ubi_wl_flush(ubi);
+		err = ubi_work_flush(ubi);
 		if (err)
 			return err;
 
