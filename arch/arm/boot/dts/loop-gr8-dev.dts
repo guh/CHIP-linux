@@ -68,15 +68,14 @@
 		stdout-path = "serial0:115200n8";
 	};
 
-    leds {
-        compatible = "gpio-leds";
-
-        status {
-            label = "chip:white:status";
-            gpios = <&axp_gpio 2 GPIO_ACTIVE_HIGH>;
-            default-state = "on";
-        };
-    };
+	leds {
+		compatible = "gpio-leds";
+		status {
+			label = "chip:white:status";
+			gpios = <&axp_gpio 2 GPIO_ACTIVE_HIGH>;
+			default-state = "on";
+		};
+	};
 
 	mmc0_pwrseq: mmc0_pwrseq {
 		compatible = "mmc-pwrseq-simple";
@@ -129,6 +128,21 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&i2c1_pins_a>;
 	status = "okay";
+
+	/*
+	* NFC chip TWI1-SCK (PB15), TWI1-SDA (PB16)
+	* Interrupt = UART2-RTS (PD5) = (3*32) + 5 = GPIO 101
+	* Reset gpio = UART2-CTS (PD4) = (3*32) + 4 = GPIO 100
+	*/
+
+	pn547: pn547@28 {
+		compatible = "nxp,pn547";
+		reg = <0x28>;
+		clock-frequency = <400000>;
+		interrupt-gpios = <&pio 3 5 0>; /* PD5 */
+		enable-gpios = <&pio 3 4 0>; /* PD4 */
+	};
+        
 };
 
 &i2s0 {
