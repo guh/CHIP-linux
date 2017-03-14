@@ -78,8 +78,6 @@
 		};
 	};
 
-	
-
 	mmc0_pwrseq: mmc0_pwrseq {
 		compatible = "mmc-pwrseq-simple";
 		pinctrl-names = "default";
@@ -133,21 +131,17 @@
 	status = "okay";
 
 	/*
-	*
 	* NFC chip TWI1-SCK (PB15), TWI1-SDA (PB16)
-	* Interrupt = UART2-RTS (PD5) = (3*32) + 5 = GPIO 101
+	* Interrupt = I2S-MCLK (PB5) = (1*32) + 5 = GPIO 37
 	* Reset gpio = UART2-CTS (PD4) = (3*32) + 4 = GPIO 100
-	*
 	*/
-	
 	pn547: pn547@28 {
 		compatible = "nxp,pn547";
 		reg = <0x28>;
 		clock-frequency = <400000>;
-		interrupt-gpios = <&lcd_rgb666_pins 3 5 0>;
-		enable-gpios = <&lcd_rgb666_pins 3 4 0>; 
+		interrupt-gpios = <&pio 1 5 GPIO_ACTIVE_HIGH>;
+		enable-gpios = <&pio 3 4 GPIO_ACTIVE_HIGH>;
 	};
-	
 };
 
 &i2s0 {
