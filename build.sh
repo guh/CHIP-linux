@@ -1,5 +1,7 @@
 #!/bin/bash -e
 
+LOOPKERNELVERSION=2
+
 export ARCH=arm
 export CROSS_COMPILE=arm-linux-gnueabihf-
 export KBUILD_DEBARCH=armhf
@@ -11,7 +13,7 @@ export DEBEMAIL="developers@guh.io"
 
 make loop_defconfig
 
-make menuconfig
+#make menuconfig
 
 make -j9 prepare modules_prepare scripts
 make -j9 deb-pkg
