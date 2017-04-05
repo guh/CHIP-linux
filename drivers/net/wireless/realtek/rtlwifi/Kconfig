@@ -57,6 +57,11 @@ config RTL8723AE
 
 	If you choose to build it as a module, it will be called rtl8723ae
 
+config RTL8723DS
+	tristate "Realtek 8723D SDIO or SPI WiFi"
+	---help---
+	Help message of RTL8723DS
+
 config RTL8723BE
 	tristate "Realtek RTL8723BE PCIe Wireless Network Adapter"
 	depends on PCI
