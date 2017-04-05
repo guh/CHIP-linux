@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-LOOPKERNELVERSION=2
+LOOPKERNELVERSION=3
 
 export ARCH=arm
 export CROSS_COMPILE=arm-linux-gnueabihf-
@@ -17,5 +17,3 @@ make loop_defconfig
 
 make -j9 prepare modules_prepare scripts
 make -j9 deb-pkg
-
-exit 0
