@@ -97,6 +97,21 @@
 		vin0-supply = <&reg_ldo3>;
 		vin1-supply = <&reg_ldo4>;
 	};
+
+	user_button: user_button {
+		compatible = "guh,loop";
+		pinctrl-names = "default";
+		pinctrl-0 = <&user_button_pin>;
+		reset-gpios = <&pio 1 6 GPIO_ACTIVE_LOW>; /* PB6 */
+	};
+
+	reset_button: reset_button {
+		compatible = "guh,loop";
+		pinctrl-names = "default";
+		pinctrl-0 = <&reset_button_pin>;
+		reset-gpios = <&pio 1 7 GPIO_ACTIVE_LOW>; /* PB7 */
+	};
+
 };
 
 &codec {
