@@ -45,7 +45,7 @@
  */
 
 /dts-v1/;
-#include "ntc-gr8.dtsi"
+#include "loop-gr8.dtsi"
 #include "sunxi-common-regulators.dtsi"
 
 #include <dt-bindings/gpio/gpio.h>
@@ -63,12 +63,6 @@
 		serial1 = &uart2;
 		serial2 = &uart3;
 	};
-
-	/*
-	* chosen {
-	*	stdout-path = "serial0:115200n8";
-	* };
-	*/
 
 	leds {
 		compatible = "gpio-leds";
@@ -97,21 +91,6 @@
 		vin0-supply = <&reg_ldo3>;
 		vin1-supply = <&reg_ldo4>;
 	};
-
-	user_button: user_button {
-		compatible = "guh,loop";
-		pinctrl-names = "default";
-		pinctrl-0 = <&user_button_pin>;
-		reset-gpios = <&pio 1 6 GPIO_ACTIVE_LOW>; /* PB6 */
-	};
-
-	reset_button: reset_button {
-		compatible = "guh,loop";
-		pinctrl-names = "default";
-		pinctrl-0 = <&reset_button_pin>;
-		reset-gpios = <&pio 1 7 GPIO_ACTIVE_LOW>; /* PB7 */
-	};
-
 };
 
 &codec {
@@ -159,12 +138,6 @@
 		interrupt-gpios = <&pio 1 5 GPIO_ACTIVE_HIGH>;
 		enable-gpios = <&pio 3 4 GPIO_ACTIVE_HIGH>;
 	};
-};
-
-&i2s0 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&i2s0_data_pins_a>, <&i2s0_data_pins_a>;
-	status = "disabled";
 };
 
 &lradc {
@@ -245,18 +218,18 @@
 		allwinner,pull = <SUN4I_PINCTRL_NO_PULL>;
 	};
 
-	user_button_pin: user-button-pin@ {
+	user_button_pin: user-button-pin@0 {
 		allwinner,pins = "PB6";
 		allwinner,function = "gpio_in";
 		allwinner,drive = <SUN4I_PINCTRL_10_MA>;
-		allwinner,pull = <SUN4I_PINCTRL_PULL_UP>;
+		allwinner,pull = <1>;
 	};
 
-	reset_button_pin: reset-button-pin@ {
+	reset_button_pin: reset-button-pin@0 {
 		allwinner,pins = "PB7";
 		allwinner,function = "gpio_in";
 		allwinner,drive = <SUN4I_PINCTRL_10_MA>;
-		allwinner,pull = <SUN4I_PINCTRL_PULL_UP>;
+		allwinner,pull = <1>;
 	};
 
 	/* Eldat easywave RX21 */
