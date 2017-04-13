@@ -243,6 +243,29 @@
 		allwinner,drive = <SUN4I_PINCTRL_10_MA>;
 		allwinner,pull = <SUN4I_PINCTRL_PULL_UP>;
 	};
+
+	/* Eldat easywave RX21 */
+	rx21_reset_pin: rx21-reset-pin@ {
+		allwinner,pins = "PE9";
+		allwinner,function = "gpio_out";
+		allwinner,drive = <SUN4I_PINCTRL_10_MA>;
+		allwinner,pull = <SUN4I_PINCTRL_NO_PULL>;
+	};
+
+	/* Zigbee 3.0 JN 5168 */
+	zigbee_program_pin: zigbee-program-pin@ {
+		allwinner,pins = "PE10";
+		allwinner,function = "gpio_out";
+		allwinner,drive = <SUN4I_PINCTRL_10_MA>;
+		allwinner,pull = <SUN4I_PINCTRL_NO_PULL>;
+	};
+
+	zigbee_reset_pin: zigbee-reset-pin@ {
+		allwinner,pins = "PE11";
+		allwinner,function = "gpio_out";
+		allwinner,drive = <SUN4I_PINCTRL_10_MA>;
+		allwinner,pull = <SUN4I_PINCTRL_NO_PULL>;
+	};
 };
 
 &pwm {
