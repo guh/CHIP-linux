@@ -45,7 +45,7 @@
  */
 
 /dts-v1/;
-#include "loop-gr8.dtsi"
+#include "ntc-gr8.dtsi"
 #include "sunxi-common-regulators.dtsi"
 
 #include <dt-bindings/gpio/gpio.h>
@@ -81,10 +81,7 @@
 		reset-gpios = <&pio 1 10 GPIO_ACTIVE_LOW>; /* PB10 */
 	};
 
-	/*
-	 * Both LDO3 and LDO4 are used in parallel to power up the
-	 * WiFi/BT Chip.
-	 */
+	/* Both LDO3 and LDO4 are used in parallel to power up the WiFi/BT Chip. */
 	vcc_wifi: wifi_reg {
 		compatible = "coupled-voltage-regulator";
 		regulator-name = "vcc-wifi";
@@ -138,6 +135,12 @@
 		interrupt-gpios = <&pio 1 5 GPIO_ACTIVE_HIGH>;
 		enable-gpios = <&pio 3 4 GPIO_ACTIVE_HIGH>;
 	};
+};
+
+&i2s0 {
+        pinctrl-names = "default";
+        pinctrl-0 = <&i2s0_data_pins_a>, <&i2s0_data_pins_a>;
+        status = "disabled";
 };
 
 &lradc {
