@@ -12473,10 +12473,6 @@ static const struct iw_priv_args rtw_private_args[] = {
 	{ MP_SD_IREAD, IW_PRIV_TYPE_CHAR | 1024, IW_PRIV_TYPE_CHAR | IW_PRIV_SIZE_MASK, "sd_iread" },
 	{ MP_SD_IWRITE, IW_PRIV_TYPE_CHAR | 1024, IW_PRIV_TYPE_CHAR | IW_PRIV_SIZE_MASK, "sd_iwrite" },
 #endif
-};
-
-
-static const struct iw_priv_args rtw_mp_private_args[] = {
 	/* --- sub-ioctls definitions --- */
 #ifdef CONFIG_MP_INCLUDED
 	{ MP_START , IW_PRIV_TYPE_CHAR | 1024, 0, "mp_start" },
@@ -12703,11 +12699,9 @@ static int _rtw_ioctl_wext_private(struct net_device *dev, union iwreq_data *wrq
 	s32 k;
 	const iw_handler *priv;		/* Private ioctl */
 	const struct iw_priv_args *priv_args;	/* Private ioctl description */
-	const struct iw_priv_args *mp_priv_args;	/*MP Private ioctl description */
 	const struct iw_priv_args *sel_priv_args;	/*Selected Private ioctl description */
 	u32 num_priv;				/* Number of ioctl */
 	u32 num_priv_args;			/* Number of descriptions */
-	u32 num_mp_priv_args;			/*Number of MP descriptions */
 	u32 num_sel_priv_args;			/*Number of Selected descriptions */
 	iw_handler handler;
 	int temp;
@@ -12750,10 +12744,8 @@ static int _rtw_ioctl_wext_private(struct net_device *dev, union iwreq_data *wrq
 
 	priv = rtw_private_handler;
 	priv_args = rtw_private_args;
-	mp_priv_args = rtw_mp_private_args;
 	num_priv = sizeof(rtw_private_handler) / sizeof(iw_handler);
 	num_priv_args = sizeof(rtw_private_args) / sizeof(struct iw_priv_args);
-	num_mp_priv_args = sizeof(rtw_mp_private_args) / sizeof(struct iw_priv_args);
 
 	if (num_priv_args == 0) {
 		err = -EOPNOTSUPP;
@@ -12768,20 +12760,11 @@ static int _rtw_ioctl_wext_private(struct net_device *dev, union iwreq_data *wrq
 	((++k < num_sel_priv_args) && strcmp(sel_priv_args[k].name, cmdname))
 		;
 
-	/* If not found... */
 	if (k == num_sel_priv_args) {
-		k = -1;
-		sel_priv_args = mp_priv_args;
-		num_sel_priv_args = num_mp_priv_args;
-		while
-		((++k < num_sel_priv_args) && strcmp(sel_priv_args[k].name, cmdname))
-			;
-
-		if (k == num_sel_priv_args) {
-			err = -EOPNOTSUPP;
-			goto exit;
-		}
+		err = -EOPNOTSUPP;
+		goto exit;
 	}
+
 
 	/* Watch out for sub-ioctls ! */
 	if (sel_priv_args[k].cmd < SIOCDEVPRIVATE) {
