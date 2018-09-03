@@ -648,7 +648,9 @@ static int io_init(struct ubi_device *ubi, int max_beb_per1024)
 	 */
 
 	ubi->peb_size = ubi->mtd->erasesize;
-	ubi->lebs_per_cpeb = mtd_pairing_groups_per_eb(ubi->mtd);
+	//ubi->lebs_per_cpeb = mtd_pairing_groups_per_eb(ubi->mtd);
+	// Force SLC mode
+	ubi->lebs_per_cpeb = 1;
 	ubi->peb_count  = mtd_div_by_eb(ubi->mtd->size, ubi->mtd);
 	ubi->flash_size = ubi->mtd->size;
 
@@ -763,7 +765,8 @@ static int io_init(struct ubi_device *ubi, int max_beb_per1024)
 		ubi->ro_mode = 1;
 	}
 
-	ubi->leb_size = (ubi->peb_size / ubi->lebs_per_cpeb) - ubi->leb_start;
+	// In SLC mode we use only the lower pages
+	ubi->leb_size = (ubi->peb_size / mtd_pairing_groups_per_eb(ubi->mtd)) - ubi->leb_start;
 
 	if (!(ubi->mtd->flags & MTD_WRITEABLE)) {
 		ubi_msg(ubi, "MTD device %d is write-protected, attach in read-only mode",
@@ -823,8 +826,10 @@ static int autoresize(struct ubi_device *ubi, int vol_id)
 			ubi_err(ubi, "cannot clean auto-resize flag for volume %d",
 				vol_id);
 	} else {
-		int avail_lebs = ubi->avail_pebs *
-				 ubi->lebs_per_cpeb;
+		//int avail_lebs = ubi->avail_pebs *
+		//		 ubi->lebs_per_cpeb;
+
+		int avail_lebs = ubi->avail_pebs;
 
 		desc.vol = vol;
 		err = ubi_resize_volume(&desc, old_reserved_lebs + avail_lebs);

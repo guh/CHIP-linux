@@ -124,6 +124,9 @@ static int ubi_io_mtd_read(const struct ubi_device *ubi, void *buf, int pnum,
 	int wunitoffs, chunklen, err = 0, end = offset + len;
 	struct mtd_pairing_info info;
 
+	// We read always in SLC mode for now, except for full reads (WL, scrubbing, ...)
+	BUG_ON(raw && (len != ubi->peb_size || offset != 0));
+
 	/*
 	 * Call mtd_read() directly if we're doing a raw read of interacting
 	 * with an SLC chip.
@@ -190,7 +193,7 @@ static int ubi_io_mtd_read(const struct ubi_device *ubi, void *buf, int pnum,
  * o %-EIO if some I/O error occurred;
  * o other negative error codes in case of other errors.
  */
-static int __ubi_io_read(const struct ubi_device *ubi, void *buf, int pnum,
+int __ubi_io_read(const struct ubi_device *ubi, void *buf, int pnum,
 			 int offset, int len, bool raw)
 {
 	int peb_size = raw ? ubi->peb_size : ubi->leb_size + ubi->leb_start;
@@ -291,6 +294,8 @@ int ubi_io_read(const struct ubi_device *ubi, void *buf, int pnum, int offset,
 int ubi_io_raw_read(const struct ubi_device *ubi, void *buf, int pnum,
 		    int offset, int len)
 {
+	// We read always in SLC mode for now
+	BUG();
 	return __ubi_io_read(ubi, buf, pnum, offset, len, true);
 }
 
@@ -300,6 +305,9 @@ int ubi_io_mtd_write(struct ubi_device *ubi, const void *buf, int pnum, int offs
 	loff_t addr = (loff_t)pnum * ubi->peb_size;
 	int chunklen, err = 0, end = offset + len;
 	struct mtd_pairing_info info;
+
+	// We write always in SLC mode for now
+	BUG_ON(raw);
 
 	if (raw || mtd_pairing_groups_per_eb(ubi->mtd) == 1)
 		return mtd_write(ubi->mtd, addr + offset, len, written, buf);
@@ -442,14 +450,15 @@ static int __ubi_io_write(struct ubi_device *ubi, const void *buf, int pnum,
 int ubi_io_write(struct ubi_device *ubi, const void *buf, int pnum, int offset,
 		 int len)
 {
-	ubi_assert(!ubi->consolidated || !ubi->consolidated[pnum]);
-
+	//ubi_assert(!ubi->consolidated || !ubi->consolidated[pnum]);
 	return __ubi_io_write(ubi, buf, pnum, offset, len, false);
 }
 
 int ubi_io_raw_write(struct ubi_device *ubi, const void *buf, int pnum,
 		     int offset, int len)
 {
+	// We write always in SLC mode for now
+	BUG();
 	return __ubi_io_write(ubi, buf, pnum, offset, len, true);
 }
 
@@ -568,9 +577,11 @@ static int torture_peb(struct ubi_device *ubi, int pnum)
 		if (err)
 			goto out;
 
-		/* Make sure the PEB contains only 0xFF bytes */
-		err = ubi_io_raw_read(ubi, ubi->peb_buf, pnum, 0,
-				      ubi->peb_size);
+		/*
+		 * Make sure the PEB contains only 0xFF bytes.
+		 * We check here not in SLC mode, we test the whole PEB.
+		 */
+		err = __ubi_io_read(ubi, ubi->peb_buf, pnum, 0, ubi->peb_size, true);
 		if (err)
 			goto out;
 
@@ -585,14 +596,12 @@ static int torture_peb(struct ubi_device *ubi, int pnum)
 
 		/* Write a pattern and check it */
 		memset(ubi->peb_buf, patterns[i], ubi->peb_size);
-		err = ubi_io_raw_write(ubi, ubi->peb_buf, pnum, 0,
-				       ubi->peb_size);
+		err = __ubi_io_write(ubi, ubi->peb_buf, pnum, 0, ubi->peb_size, true);
 		if (err)
 			goto out;
 
 		memset(ubi->peb_buf, ~patterns[i], ubi->peb_size);
-		err = ubi_io_raw_read(ubi, ubi->peb_buf, pnum, 0,
-				      ubi->peb_size);
+		err = __ubi_io_read(ubi, ubi->peb_buf, pnum, 0, ubi->peb_size, true);
 		if (err)
 			goto out;
 

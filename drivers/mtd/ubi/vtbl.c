@@ -237,7 +237,7 @@ static int vtbl_check(const struct ubi_device *ubi,
 			goto bad;
 		}
 
-		reserved_lebs = DIV_ROUND_UP(reserved_lebs, ubi->lebs_per_cpeb);
+		//reserved_lebs = DIV_ROUND_UP(reserved_lebs, ubi->lebs_per_cpeb);
 		if (reserved_lebs > ubi->good_peb_count) {
 			ubi_err(ubi, "too large reserved_lebs %d, good PEBs %d",
 				reserved_lebs, ubi->good_peb_count);
@@ -655,11 +655,12 @@ static int init_volumes(struct ubi_device *ubi,
 
 	ubi_assert(!ubi->volumes[i]);
 	ubi->volumes[vol_id2idx(ubi, vol->vol_id)] = vol;
-	reserved_lebs += vol->reserved_lebs * ubi->lebs_per_cpeb;
+	//reserved_lebs += vol->reserved_lebs * ubi->lebs_per_cpeb;
+	reserved_lebs += vol->reserved_lebs;
 	ubi->vol_count += 1;
 	vol->ubi = ubi;
 
-	reserved_lebs = DIV_ROUND_UP(reserved_lebs, ubi->lebs_per_cpeb);
+	//reserved_lebs = DIV_ROUND_UP(reserved_lebs, ubi->lebs_per_cpeb);
 	if (reserved_lebs > ubi->avail_pebs) {
 		ubi_err(ubi, "not enough PEBs, required %d, available %d",
 			reserved_lebs, ubi->avail_pebs);

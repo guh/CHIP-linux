@@ -940,6 +940,9 @@ bool ubi_conso_remove_full_leb(struct ubi_device *ubi, int vol_id, int lnum);
 int ubi_conso_init(struct ubi_device *ubi);
 void ubi_conso_close(struct ubi_device *ubi);
 int ubi_conso_sync(struct ubi_device *ubi);
+
+#error
+
 #else
 static inline bool ubi_conso_consolidation_needed(struct ubi_device *ubi)
 {
@@ -962,6 +965,10 @@ static inline int ubi_conso_add_full_leb(struct ubi_device *ubi, int vol_id, int
 static inline int ubi_conso_init(struct ubi_device *ubi) { return 0; }
 static inline void ubi_conso_close(struct ubi_device *ubi) {}
 static inline int ubi_conso_sync(struct ubi_device *ubi) { return 0; }
+static inline bool ubi_conso_remove_full_leb(struct ubi_device *ubi, int vol_id, int lnum)
+{
+	return false;
+}
 #endif
 
 /* wl.c */
@@ -1020,6 +1027,8 @@ int ubi_io_write_vid_hdr(struct ubi_device *ubi, int pnum,
 			 struct ubi_vid_hdr *vid_hdr);
 int ubi_io_write_vid_hdrs(struct ubi_device *ubi, int pnum,
 			  struct ubi_vid_hdr *vid_hdrs, int num);
+int __ubi_io_read(const struct ubi_device *ubi, void *buf, int pnum,
+			 int offset, int len, bool raw);
 
 /* build.c */
 int ubi_attach_mtd_dev(struct mtd_info *mtd, int ubi_num,

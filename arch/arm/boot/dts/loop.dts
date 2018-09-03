@@ -127,28 +127,14 @@
 	* NFC chip TWI1-SCK (PB15), TWI1-SDA (PB16)
 	* Interrupt = I2S-MCLK (PB5) = (1*32) + 5 = GPIO 37
 	* Reset gpio = UART2-CTS (PD4) = (3*32) + 4 = GPIO 100
-	*
-	* pn547: pn547@28 {
-	* 	compatible = "nxp,pn547";
-	* 	reg = <0x28>;
-	* 	clock-frequency = <400000>;
-	* 	interrupt-gpios = <&pio 1 5 GPIO_ACTIVE_HIGH>;
-	* 	enable-gpios = <&pio 3 4 GPIO_ACTIVE_HIGH>;
-	* };
 	*/
 
-	pn7150: pn7150@28 {
-
-		compatible = "nxp,nxp-nci-i2c";
-
+	pn547: pn547@28 {
+		compatible = "nxp,pn547";
 		reg = <0x28>;
 		clock-frequency = <400000>;
-
-		interrupt-parent = <&pio>;
-		interrupts = <1 5 GPIO_ACTIVE_HIGH>;
-
+		interrupt-gpios = <&pio 1 5 GPIO_ACTIVE_HIGH>;
 		enable-gpios = <&pio 3 4 GPIO_ACTIVE_HIGH>;
-		firmware-gpios = <&pio 1 6 GPIO_ACTIVE_HIGH>;
 	};
 };
 

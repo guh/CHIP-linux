@@ -377,7 +377,8 @@ int ubi_compare_lebs(struct ubi_device *ubi, const struct ubi_ainf_leb *aeb,
 			return 1;
 		}
 	} else {
-		int nvidh = ubi->lebs_per_cpeb;
+		// SLC mode
+		int nvidh = 1;
 
 		if (!aeb->copy_flag) {
 			/* It is not a copy, so it is newer */
@@ -948,7 +949,7 @@ static int scan_peb(struct ubi_device *ubi, struct ubi_attach_info *ai,
 	}
 
 	/* OK, we've done with the EC header, let's look at the VID header */
-	nvidh = ubi->lebs_per_cpeb;
+	nvidh = 1;
 	err = ubi_io_read_vid_hdrs(ubi, pnum, vidh, &nvidh, 0);
 	if (err < 0)
 		return err;
@@ -1704,7 +1705,7 @@ static int self_check_ai(struct ubi_device *ubi, struct ubi_attach_info *ai)
 		last_leb = NULL;
 		ubi_rb_for_each_entry(rb2, leb, &av->root, rb) {
 			int vol_type;
-			int nvidh = ubi->lebs_per_cpeb;
+			int nvidh = 1;
 
 			cond_resched();
 

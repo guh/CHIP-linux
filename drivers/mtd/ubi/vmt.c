@@ -213,8 +213,9 @@ int ubi_create_volume(struct ubi_device *ubi, struct ubi_mkvol_req *req)
 				     vol->usable_leb_size);
 
 	/* Reserve physical eraseblocks */
-	rsvd_pebs = DIV_ROUND_UP(vol->reserved_lebs,
-				 ubi->lebs_per_cpeb);
+	//rsvd_pebs = DIV_ROUND_UP(vol->reserved_lebs,
+	//			 ubi->lebs_per_cpeb);
+	rsvd_pebs = vol->reserved_lebs;
 	if (rsvd_pebs > ubi->avail_pebs) {
 		ubi_err(ubi, "not enough PEBs, only %d available",
 			ubi->avail_pebs);
@@ -415,8 +416,9 @@ int ubi_remove_volume(struct ubi_volume_desc *desc, int no_vtbl)
 	cdev_del(&vol->cdev);
 	device_unregister(&vol->dev);
 
-	reserved_pebs = DIV_ROUND_UP(vol->reserved_lebs,
-				     ubi->lebs_per_cpeb);
+	//reserved_pebs = DIV_ROUND_UP(vol->reserved_lebs,
+	//			     ubi->lebs_per_cpeb);
+	reserved_pebs = vol->reserved_lebs;
 	spin_lock(&ubi->volumes_lock);
 	ubi->rsvd_pebs -= reserved_pebs;
 	ubi->avail_pebs += reserved_pebs;
@@ -489,11 +491,13 @@ int ubi_resize_volume(struct ubi_volume_desc *desc, int reserved_lebs)
 	spin_unlock(&ubi->volumes_lock);
 
 	/* Reserve physical eraseblocks */
-	lebs = reserved_lebs - vol->reserved_lebs;
+	pebs = lebs = reserved_lebs - vol->reserved_lebs;
+#if 0
 	pebs = DIV_ROUND_UP(reserved_lebs,
 			    ubi->lebs_per_cpeb) -
 	       DIV_ROUND_UP(vol->reserved_lebs,
 			    ubi->lebs_per_cpeb);
+#endif
 	if (lebs > 0) {
 		spin_lock(&ubi->volumes_lock);
 		if (pebs > ubi->avail_pebs) {

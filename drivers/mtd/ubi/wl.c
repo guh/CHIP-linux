@@ -717,7 +717,8 @@ static int wear_leveling_worker(struct ubi_device *ubi, struct ubi_work *wrk,
 	struct ubi_wl_entry *e1, *e2;
 	struct ubi_vid_hdr *vid_hdr;
 	int dst_leb_clean = 0;
-	int nvidh = ubi->lebs_per_cpeb;
+	// We want only one header, SLC mode...
+	int nvidh = 1;
 
 	if (shutdown)
 		return 0;
@@ -1444,7 +1445,7 @@ int ubi_bitflip_check(struct ubi_device *ubi, int pnum, int force_scrub)
 
 	if (!force_scrub) {
 		mutex_lock(&ubi->buf_mutex);
-		err = ubi_io_raw_read(ubi, ubi->peb_buf, pnum, 0, ubi->peb_size);
+		err = __ubi_io_read(ubi, ubi->peb_buf, pnum, 0, ubi->peb_size, true);
 		mutex_unlock(&ubi->buf_mutex);
 	}
 
@@ -1554,9 +1555,9 @@ static void tree_destroy(struct ubi_device *ubi, struct rb_root *root)
 int ubi_wl_init(struct ubi_device *ubi, struct ubi_attach_info *ai)
 {
 	int err, i, reserved_pebs, found_pebs = 0;
-	struct rb_node *rb1, *rb2;
-	struct ubi_ainf_volume *av;
-	struct ubi_ainf_leb *leb;
+	//struct rb_node *rb1, *rb2;
+	//struct ubi_ainf_volume *av;
+	//struct ubi_ainf_leb *leb;
 	struct ubi_ainf_peb *peb, *tmp;
 	struct ubi_wl_entry *e;
 	struct ubi_leb_desc *clebs;
@@ -1575,6 +1576,7 @@ int ubi_wl_init(struct ubi_device *ubi, struct ubi_attach_info *ai)
 	if (!ubi->lookuptbl)
 		return err;
 
+#if 0
 	if (ubi->lebs_per_cpeb > 1) {
 		ubi->consolidated = kzalloc(ubi->peb_count * sizeof(void *),
 					    GFP_KERNEL);
@@ -1583,6 +1585,7 @@ int ubi_wl_init(struct ubi_device *ubi, struct ubi_attach_info *ai)
 			return err;
 		}
 	}
+#endif
 
 	for (i = 0; i < UBI_PROT_QUEUE_LEN; i++)
 		INIT_LIST_HEAD(&ubi->pq[i]);
@@ -1654,6 +1657,9 @@ int ubi_wl_init(struct ubi_device *ubi, struct ubi_attach_info *ai)
 		if (peb->consolidated) {
 			int i;
 
+			// Must no longer happen
+			BUG();
+
 			clebs = kmalloc(sizeof(*clebs) *
 					ubi->lebs_per_cpeb,
 					GFP_KERNEL);
@@ -1671,6 +1677,7 @@ int ubi_wl_init(struct ubi_device *ubi, struct ubi_attach_info *ai)
 		found_pebs++;
 	}
 
+#if 0
 	ubi_rb_for_each_entry(rb1, av, &ai->volumes, rb) {
 		ubi_rb_for_each_entry(rb2, leb, &av->root, rb) {
 			cond_resched();
@@ -1682,6 +1689,7 @@ int ubi_wl_init(struct ubi_device *ubi, struct ubi_attach_info *ai)
 			}
 		}
 	}
+#endif
 
 	dbg_wl("found %i PEBs", found_pebs);
 

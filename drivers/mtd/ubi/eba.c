@@ -391,6 +391,8 @@ int ubi_eba_read_leb(struct ubi_device *ubi, struct ubi_volume *vol, int lnum,
 
 	clebs = ubi_conso_get_consolidated(ubi, pnum);
 	if (clebs) {
+		// Cannot happen in SLC case
+		BUG();
 		for (; lpos < ubi->lebs_per_cpeb; lpos++) {
 			if (clebs[lpos].vol_id == vol->vol_id &&
 			    clebs[lpos].lnum == lnum)
@@ -405,7 +407,7 @@ int ubi_eba_read_leb(struct ubi_device *ubi, struct ubi_volume *vol, int lnum,
 
 retry:
 	if (check) {
-		int nvidh = ubi->lebs_per_cpeb;
+		int nvidh = 1;
 
 		vid_hdr = ubi_zalloc_vid_hdr(ubi, GFP_NOFS);
 		if (!vid_hdr) {
@@ -1392,6 +1394,9 @@ int ubi_eba_copy_lebs(struct ubi_device *ubi, int from, int to,
 	int *vol_id = NULL, *lnum = NULL;
 	struct ubi_volume **vol = NULL;
 
+	// Must never get called in SLC mode
+	BUG();
+
 	vol_id = kmalloc(nvidh * sizeof(*vol_id), GFP_NOFS);
 	lnum = kmalloc(nvidh * sizeof(*lnum), GFP_NOFS);
 	vol = kmalloc(nvidh * sizeof(*vol), GFP_NOFS);
@@ -1822,6 +1827,9 @@ int ubi_eba_init(struct ubi_device *ubi, struct ubi_attach_info *ai)
 				if (clebs) {
 					int i;
 
+					// Must not happen
+					BUG();
+
 					for (i = 0; i < ubi->lebs_per_cpeb; i++) {
 						if (clebs[i].lnum < 0) {
 							aeb->full = true;
@@ -1863,9 +1871,10 @@ int ubi_eba_init(struct ubi_device *ubi, struct ubi_attach_info *ai)
 		ubi->avail_pebs -= ubi->beb_rsvd_pebs;
 		ubi->rsvd_pebs  += ubi->beb_rsvd_pebs;
 	}
-
+#if 0
 	if (ubi->lebs_per_cpeb > 1)
 		ubi_conso_schedule(ubi);
+#endif
 
 	dbg_eba("EBA sub-system is initialized");
 	return 0;

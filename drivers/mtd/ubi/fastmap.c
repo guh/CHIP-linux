@@ -515,8 +515,8 @@ static int scan_pool(struct ubi_device *ubi, struct ubi_attach_info *ai,
 			goto out;
 		}
 
-		/* TODO: support consolidate PEBs */
-		nvid = ubi->lebs_per_cpeb;
+		// SLC mode
+		nvid = 1;
 		err = ubi_io_read_vid_hdrs(ubi, pnum, vh, &nvid, 0);
 		if (err == UBI_IO_FF || err == UBI_IO_FF_BITFLIPS) {
 			unsigned long long ec = be64_to_cpu(ech->ec);
@@ -1326,6 +1326,9 @@ static int ubi_write_fastmap(struct ubi_device *ubi,
 		if (ubi->consolidated) {
 			struct ubi_fm_consolidated *fconso;
 			struct ubi_fm_consolidated_leb *fcleb;
+
+			// Must not happen in SLC mode
+			BUG();
 
 			fconso = (struct ubi_fm_consolidated *)(fm_raw + fm_pos);
 			for (j = 0; j < vol->reserved_lebs; j++) {
